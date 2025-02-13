@@ -1,10 +1,26 @@
-from database.db_connection import conectarBancoDados
+from models.database import GerenciadorBancoDados
+from controllers.base import GerenciadorJanelas
+import tkinter as tk
+import logging
 
-def main():
-    gerenciador = conectarBancoDados(host="localhost", user="root", password="", database="gestão_pessoal")
-    gerenciador.conectar()
+class MainApp:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Sistema de Gestão de Pessoal")
+        self.root.geometry("800x600")
+
+        try:
+            self.db_manager = GerenciadorBancoDados()
+            self.gerenciador = GerenciadorJanelas(self.root)
+
+        except Exception as e:
+            logging.error(f"Erro na inicialização: {e}")
+    
+    def conexao_banco(self):
+        self.db_manager.conectar()
 
 if __name__ == "__main__":
-    main()
+    app = MainApp()
+    app.conexao_banco()
 
     
