@@ -1,77 +1,58 @@
 import mysql.connector
 from mysql.connector import Error
-from tkinter import messagebox
 
 class GerenciadorBancoDados:
     def __init__(self):
-        self.connection = None
+        self.conexao = None
 
     def conectar(self):
-        """Estabelece uma conexão com o banco de dados."""
+        """Conecta ao banco de dados MySQL."""
         try:
-            self.connection = mysql.connector.connect(
-                host='localhost',
-                user='root',
-                database='gestao_pessoal'
+            self.conexao = mysql.connector.connect(
+                host="localhost",
+                user="root",  # Substitua pelo seu usuário do MySQL
+                password="",  # Substitua pela sua senha do MySQL
+                database="gestao_pessoal"
             )
-            print("Conexão com o banco de dados estabelecida")
-            return self.connection
+            if self.conexao.is_connected():
+                print("Conexão ao banco de dados estabelecida com sucesso!")
         except Error as e:
-            messagebox.showerror("Erro de Conexão", f"Falha ao conectar ao banco de dados: {e}")
-            return None
-
-    def executar_consulta(self, query, params=None):
-        """Executa uma consulta SELECT e retorna uma lista de dicionários."""
-        try:
-            cursor = self.connection.cursor(dictionary=True)
-            cursor.execute(query, params or ())
-            resultados = cursor.fetchall()
-            cursor.close()
-            return resultados
-        except Error as e:
-            messagebox.showerror("Erro na Consulta", f"Falha ao executar consulta: {e}")
-            return []
-
-    def executar_comando(self, query, params=None):
-        """Executa um comando INSERT/UPDATE/DELETE com commit automático."""
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute(query, params or ())
-            self.connection.commit()
-            cursor.close()
-            return True
-        except Error as e:
-            messagebox.showerror("Erro no Comando", f"Falha ao executar comando: {e}")
-            return False
-
-    def iniciar_transacao(self):
-        """Inicia uma nova transação."""
-        try:
-            self.connection.start_transaction()
-            return True
-        except Error as e:
-            messagebox.showerror("Erro na Transação", f"Falha ao iniciar transação: {e}")
-            return False
-
-    def confirmar_transacao(self):
-        """Confirma (commit) a transação atual."""
-        try:
-            self.connection.commit()
-            return True
-        except Error as e:
-            messagebox.showerror("Erro na Transação", f"Falha ao confirmar transação: {e}")
-            return False
-
-    def reverter_transacao(self):
-        """Reverte (rollback) a transação atual."""
-        try:
-            self.connection.rollback()
-            return True
-        except Error as e:
-            messagebox.showerror("Erro na Transação", f"Falha ao reverter transação: {e}")
-            return False
+            print(f"Erro ao conectar ao banco de dados: {e}")
+            self.conexao = None
 
     def fechar_conexao(self):
         """Fecha a conexão com o banco de dados."""
-        if self.connection:
-            self.connection.close()
+        if self.conexao and self.conexao.is_connected():
+            self.conexao.close()
+            print("Conexão ao banco de dados fechada.")
+
+    def executar_consulta(self, query, params=None):
+        """Executa uma consulta SELECT e retorna os resultados."""
+        if not self.conexao or not self.conexao.is_connected():
+            raise Exception("Conexão com o banco de dados não estabelecida.")
+
+        cursor = self.conexao.cursor(dictionary=True)
+        try:
+            cursor.execute(query, params)
+            return cursor.fetchall()
+        except Error as e:
+            print(f"Erro ao executar consulta: {e}")
+            return None
+        finally:
+            cursor.close()
+
+    def executar_comando(self, query, params=None):
+        """Executa um comando INSERT/UPDATE/DELETE."""
+        if not self.conexao or not self.conexao.is_connected():
+            raise Exception("Conexão com o banco de dados não estabelecida.")
+
+        cursor = self.conexao.cursor()
+        try:
+            cursor.execute(query, params)
+            self.conexao.commit()
+            print("Comando executado com sucesso!")
+        except Error as e:
+            print(f"Erro ao executar comando: {e}")
+            self.conexao.rollback()
+        finally:
+            cursor.close()

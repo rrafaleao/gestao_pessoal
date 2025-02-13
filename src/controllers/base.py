@@ -3,27 +3,27 @@ import tkinter as tk
 class GerenciadorJanelas:
     def __init__(self, root):
         self.root = root
-        self.frames = {}
-        self.frame_atual = None
-        
-        # Criar container principal
-        self.container = tk.Frame(self.root)
-        self.container.pack(side="top", fill="both", expand=True)
-        
-    def adicionar_frame(self, nome, frame):
-        """Adiciona um frame ao gerenciador"""
-        self.frames[nome] = frame
-        frame.grid(row=0, column=0, sticky="nsew", in_=self.container)
-        frame.grid_remove()  # Esconde o frame inicialmente
-        
+        self.frames = {}  # Dicionário para armazenar os frames
+        self.container = tk.Frame(self.root)  # Container para os frames
+        self.container.pack(fill="both", expand=True)
+
+    def adicionar_frame(self, nome, frame_class):
+        """
+        Adiciona um frame ao gerenciador.
+        :param nome: Nome único para o frame.
+        :param frame_class: Classe do frame ou instância do frame.
+        """
+        if isinstance(frame_class, type):  # Se for uma classe
+            self.frames[nome] = frame_class(self.container)
+        else:  # Se for uma instância
+            self.frames[nome] = frame_class
+        self.frames[nome].grid(row=0, column=0, sticky="nsew")
+
     def mostrar_frame(self, nome):
-        """Mostra o frame especificado e esconde o atual"""
-        if self.frame_atual:
-            self.frame_atual.grid_remove()
-        
+        """
+        Mostra o frame especificado.
+        :param nome: Nome do frame a ser mostrado.
+        """
         frame = self.frames.get(nome)
         if frame:
-            frame.grid()
-            self.frame_atual = frame
-        else:
-            raise ValueError(f"Frame '{nome}' não encontrado") 
+            frame.tkraise()  # Traz o frame para o topo
