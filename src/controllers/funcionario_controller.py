@@ -48,20 +48,11 @@ class FuncionarioController:
         except Exception as e:
             self.view.mostrar_mensagem("Erro", f"Falha ao buscar funcionário: {e}")
             return None
-
-    def excluir_por_cpf(self, cpf):
-        """Exclui um funcionário pelo CPF."""
+    
+    def buscar_todos_funcionarios(self):
+        """Busca todos os funcionários cadastrados."""
         try:
-            self.model.excluir_por_cpf(cpf)
-            self.view.mostrar_mensagem("Sucesso", "Funcionário excluído com sucesso!")
+            return self.model.buscar_todos_funcionarios()
         except Exception as e:
-            self.view.mostrar_mensagem("Erro", f"Falha ao excluir funcionário: {e}")
-
-    def atualizar_status_por_cpf(self, cpf, ativo=True):
-        """Atualiza o status do funcionário."""
-        try:
-            self.model.atualizar_status_por_cpf(cpf, ativo)
-            status = "ativado" if ativo else "desativado"
-            self.view.mostrar_mensagem("Sucesso", f"Funcionário {status} com sucesso!")
-        except Exception as e:
-            self.view.mostrar_mensagem("Erro", f"Falha ao atualizar status: {e}")
+            self.view.mostrar_mensagem("Erro", f"Falha ao buscar funcionários: {e}")
+            return []

@@ -25,3 +25,8 @@ class FuncionarioModel:
     def atualizar_status_por_cpf(self, cpf, ativo=True):
         query = "UPDATE Funcionarios SET ativo = %s WHERE cpf = %s"
         self.db.executar_comando(query, (ativo, cpf))
+
+    def buscar_todos_funcionarios(self):
+        """Busca todos os funcionários cadastrados."""
+        query = "SELECT * FROM Funcionarios"
+        return self.db.executar_consulta(query)

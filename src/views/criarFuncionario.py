@@ -1,6 +1,6 @@
 from views.base import FormularioBase
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 
 class FuncionarioView(FormularioBase):
     def __init__(self, master, controller):
@@ -35,13 +35,8 @@ class FuncionarioView(FormularioBase):
 
     def buscar(self):
         """Busca um funcionário pelo CPF."""
-        cpf = self.widgets["CPF"].get()
-        resultado = self.controller.buscar_por_cpf(cpf)
-        if resultado:
-            self.preencher_formulario(resultado[0])
-            self.mostrar_mensagem("Sucesso", "Funcionário encontrado!")
-        else:
-            self.mostrar_mensagem("Erro", "Funcionário não encontrado.")
+        cpf = self.widgets["CPF"].get()  # Coleta o CPF do campo correspondente
+        self.controller.buscar_por_cpf(cpf)  # Chama o método do Controller
 
     def excluir(self):
         """Exclui um funcionário."""
@@ -54,11 +49,13 @@ class FuncionarioView(FormularioBase):
         self.controller.atualizar_status_por_cpf(cpf)
 
     def preencher_formulario(self, dados):
-        """Preenche o formulário com os dados do funcionário."""
+        """Preenche os campos do formulário com os dados do funcionário."""
         for campo, valor in dados.items():
             if campo in self.widgets:
-                self.widgets[campo].delete(0, tk.END)
-                self.widgets[campo].insert(0, valor)
+                widget = self.widgets[campo]
+                if isinstance(widget, tk.Entry) or isinstance(widget, ttk.Combobox):
+                    widget.delete(0, tk.END)
+                    widget.insert(0, valor)
 
     def mostrar_mensagem(self, titulo, mensagem):
         """Exibe uma mensagem na tela."""

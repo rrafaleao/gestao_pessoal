@@ -31,7 +31,7 @@ class GerenciadorBancoDados:
         if not self.conexao or not self.conexao.is_connected():
             raise Exception("Conexão com o banco de dados não estabelecida.")
 
-        cursor = self.conexao.cursor(dictionary=True)
+        cursor = self.conexao.cursor(dictionary=True)  # Retorna dicionários
         try:
             cursor.execute(query, params)
             return cursor.fetchall()
